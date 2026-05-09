@@ -82,31 +82,53 @@
           }
       }
     });
-    setInterval(() => {
-      document.getElementById('previous_xml_data').onchange = function() {
-        processManualProcedures('READ-DATA-AND-PREVIEW');
-      }
-      document.getElementById('selectedScene').onchange = function() {
-        processManualProcedures('LOAD_SCENE');
-      }
-      processManualProcedures('READ-MATCH-AND-POPULATE');
-      processManualProcedures('CHECK_CONNECTION');
-    }, 1000);
+    $(document).ready(function() {
+
+        // select2 fires 'select2:select' not native 'change'
+        $('#previous_xml_data').on('select2:select', function() {
+            processManualProcedures('READ-DATA-AND-PREVIEW', $(this).val());
+        });
+
+        $('#selectedScene').on('select2:select', function() {
+            processManualProcedures('LOAD_SCENE', $(this).val());
+        });
+
+        setInterval(() => {
+            processManualProcedures('CHECK_CONNECTION', '');
+        }, 5000);
+
+    });
   </script>
   <!-- Additional Responsive & Modern CSS -->
   <style type="text/css">
    body {
-    font-size: 1.6rem; /* 22px converted to rem (assuming 16px base) */
-   }
-   h1, h2, h3, h4, h5, h6,a {
-    font-size: larger; /* This remains relative to the base font-size */
-   }
-   button, input, select, textarea {
-    font-size: 1.5rem; /* 18px converted to rem */
-   }
-   .card-title, .panel-title, .form-group label {
-     font-size: 1.4rem; /* 20px converted to rem */
-   }
+	  font-size: 14px;
+	  font-family: "Segoe UI", Arial, sans-serif;
+	  color: #1F2937;
+	}
+	
+	h1, h2, h3, h4, h5, h6 {
+	  margin: 0;
+	}
+	
+	button,
+	input,
+	select,
+	textarea {
+	  font-size: 14px !important;
+	}
+	
+	.form-group label,
+	.configuration-row label {
+	  font-size: 14px;
+	  font-weight: 600;
+	  color: #374151;
+	}
+	
+	.panel-title {
+	  font-size: 18px !important;
+	  font-weight: 700;
+	}
     /* Subtle gradient background for entire page */
     body {
     padding: 0 !important;
@@ -129,33 +151,34 @@
 	}
 
     /* Container for the main content */
-    #main_div.content.py-1 {
-      width: 100vw;
-      height: 100vh;
-      box-shadow: 0 4px 2px rgba(0,0,0,0.2);
-      border-radius: 12px;
-      overflow: hidden;
-    }
+   #main_div.content.py-1 {
+	  width: 100%;
+	  min-height: 100vh;
+	  overflow-x: hidden;
+	  overflow-y: auto;
+	  padding: 12px;
+	}
     /* The outer .col-md-13 offset-md-0 container */
-    .col-md-13.offset-md-0 {
-      border-radius: 20px;
-      box-shadow: 0 5px 5px rgba(0,0,0,0.2);
-      padding: 5px;
-      margin-bottom: 4px;
-    }
+   .col-md-13.offset-md-0 {
+	  width: 100%;
+	  margin: 0;
+	  padding: 0;
+	}
     /* Card styling improvements */
-    .card.card-outline-secondary {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 4px 5px rgba(0,0,0,0.1);
-      margin-bottom: 2px;
-      border: none; /* Hide default card border */
-    }
+   .card.card-outline-secondary {
+	  background: rgba(255,255,255,0.96);
+	  border-radius: 14px;
+	  border: 1px solid rgba(255,255,255,0.4);
+	  box-shadow:0 10px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+	  backdrop-filter: blur(8px);
+	  overflow: hidden;
+	}
     .card-header {
-      background-color: #CDE5E7;
+    	background: linear-gradient( 90deg, #0F172A, #1E293B);
+	  padding: 14px 20px;
+	  border-bottom: none;
       border-radius: 8px 8px 0 0;
-      padding: 15px;
-      border-bottom: 1px solid #ddd;
+      
     }
     .card-body {
       padding: 15px;
@@ -166,9 +189,15 @@
       border: none;
     }
     .panel-title {
-      text-shadow: 2px 5px 6px #BBA2B6;
-      font-size: 25px;
-    }
+	  font-size: 18px !important;
+	  font-weight: 700;
+	  text-shadow: none;
+	}
+	
+	.panel-title a {
+	  color: black !important;
+	  text-decoration: none;
+	}
 
     /* Buttons with a slight box-shadow & hover effect */
     .btn-sm {
@@ -309,8 +338,12 @@
 	}
 	
 	/* Left and right columns share the space equally on large screens */
-	.left-col, .right-col {
-	  flex: 1; /* Each takes up 50% on large screens */
+	.left-col {
+	  flex: 0 0 38%;
+	}
+	
+	.right-col {
+	  flex: 0 0 60%;
 	}
 	
 	/* Stack row-items vertically in the left column */
@@ -324,7 +357,8 @@
 	.row-item {
 	  display: flex;
 	  align-items: center;
-	  gap: 6rem; /* 10px => 0.625rem */
+	  gap: 12px;
+	  width: 100%;
 	}
 	
 	/* Right column: buttons, allow wrapping if needed */
@@ -338,7 +372,7 @@
 	/* Basic styling for labels */
 	.configuration-row label {
 	  font-weight: bold;
-	  color: #2E008B;
+	  color: black;
 	  white-space: nowrap; /* keep label on one line */
 	}
 	
@@ -347,15 +381,33 @@
 	  /* Let them expand on wide screens; override with media queries below if desired */
 	  width: 100% !important;
 	  max-width: 100% !important; /* 240px => 15rem, adjust as needed */
+	  height: 42px;
+	  border-radius: 10px;
+	  border: 1px solid #D1D5DB;
+	  background: #FFFFFF;
+	  padding: 0 12px;
+	  font-size: 14px !important;
+	  transition: all 0.2s ease;
+	}
+	
+	.configuration-row select:focus {
+	  border-color: #2563EB;
+	  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+	  outline: none;
 	}
 	
 	/* Purple Buttons */
 	.purple-btn {
-	  background-color: #2E008B;
-	  color: #FEFEFE;
-	  font-size: 1.7rem; /* 18px => 1.125rem */
-	  text-shadow: 0.125rem 0.3125rem 0.375rem #BBA2B6;
-	  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+	  background: linear-gradient(135deg, #2563EB, #1D4ED8);
+	  border: none;
+	  color: white;
+	  border-radius: 10px;
+	  padding: 10px 16px;
+	  font-size: 13px !important;
+	  font-weight: 600;
+	  min-height: 42px;
+	  text-shadow: none;
+	  box-shadow: 0 4px 12px rgba(37,99,235,0.25);
 	}
 	.purple-btn:hover {
 	  background-color: #1D0066; /* A darker shade of purple */
@@ -365,11 +417,16 @@
 	
 	/* Red Buttons */
 	.red-btn {
-	  background-color: #f44336;
-	  color: #FEFEFE;
-	  font-size: 1.7rem;
-	  text-shadow: 0.125rem 0.3125rem 0.375rem #BBA2B6;
-	  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+	  background: linear-gradient(135deg, #EF4444, #DC2626);
+	  border: none;
+	  color: white;
+	  border-radius: 10px;
+	  padding: 10px 16px;
+	  font-size: 13px !important;
+	  font-weight: 600;
+	  min-height: 42px;
+	  text-shadow: none;
+	  box-shadow: 0 4px 12px rgba(239,68,68,0.25);
 	}
 	.red-btn:hover {
 	  color: #fff; 
@@ -429,12 +486,13 @@
 	    }
 	
 	    /* Adjust buttons inside .right-col */
-	    .right-col {
-	        display: flex;
-	        flex-wrap: wrap; /* Allow buttons to wrap */
-	        gap: 0.75rem; /* Adjust gap between buttons */
-	        justify-content: flex-start; /* Align buttons to the left */
-	    }
+	   .right-col {
+		  display: flex;
+		  flex-wrap: wrap;
+		  gap: 10px;
+		  justify-content: flex-start;
+		  align-items: center;
+		}
 	
 	    /* .btn-sm adjustments */
 	    .btn-sm {
@@ -558,7 +616,7 @@
 <form:form name="manual_form" autocomplete="off" action="manual" method="POST" 
 	modelAttribute="session_Data" enctype="multipart/form-data">
 <div id="main_div" class="content py-1" style="width: 100vw; height: 100vh;">
-<div class="container-fluid h-100 d-flex align-items-center justify-content-center" style="width: 90%; margin: 0 auto;">
+<div class="container-fluid px-3 py-3" style="width:100%;">
 	<div class="row">
 	 <div class="col-md-13 offset-md-0">
        <span class="anchor"></span>
@@ -573,11 +631,16 @@
 			</div>
 			  <div class="panel-group" id="match_configuration">
 			    <div class="panel panel-default">
-			      <div class="panel-heading">
-			        <h2 class="panel-title" style="font-size: 25px; text-shadow: 2px 5px 6px #BBA2B6">
-			          <a data-toggle="collapse" data-parent="#match_configuration" href="#load_setup_match">Configuration</a>
-			        </h2>
-			      </div>
+			      <div class="panel-heading d-flex align-items-center justify-content-between">
+					    <h2 class="panel-title m-0">
+					        <a data-bs-toggle="collapse" data-bs-parent="#match_configuration" href="#load_setup_match"
+					           style="color:#FFFFFF; text-decoration:none; font-size:18px; font-weight:600; letter-spacing:0.5px;">
+					           <i class="fas fa-sliders-h me-2"></i>
+					           Configuration
+					        </a>
+					    </h2>
+					
+					</div>
 			      <div id="load_setup_match" class="panel-collapse collapse">
 					<div class="panel-body">
 						<!-- Configuration Row -->

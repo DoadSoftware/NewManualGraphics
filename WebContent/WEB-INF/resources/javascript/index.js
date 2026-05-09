@@ -219,103 +219,96 @@ function uploadFormDataToSessionObjects(whatToProcess,whichInput)
 	}	
 	
 }
-function processManualProcedures(whatToProcess)
-{
-	var valueToProcess;
-	
-	switch(whatToProcess) {
-	case 'LOAD_SCENE': case 'LOAD_PREVIOUS_SCENE': case 'LOAD_DATA': case 'BADMINTON-OPTIONS': case 'CRICKET-OPTIONS': case 'FOOTBALL-OPTIONS':
-	case 'READ-DATA-AND-PREVIEW': case 'ANIMATE-IN': case"CHECK_CONNECTION":case 'LOAD_CONTAINER': case 'READ-MATCH-AND-POPULATE': case 'PREVIEW':case'PREVIEW_IMAGE_DATA':
-    	switch(whatToProcess) {
-		case 'LOAD_SCENE':
-			valueToProcess = $('#selectedScene option:selected').val();
-			break;
-		case 'LOAD_PREVIOUS_SCENE':
-			valueToProcess =$('#previous_xml_data option:selected').val();
-			break;
-		case 'LOAD_DATA':
-			if($('#selectedScene option:selected').val().includes('_Rows_')){
-				valueToProcess = $('#selectedScene option:selected').val()+","+$('#rows').val()+","+$('#column').val();
-				 $('#RowCol_stats_div').empty();
-	    		 $('#RowCol_stats_div').css('display', 'none');
-			}else{
-				valueToProcess = $('#selectedScene option:selected').val();
-			}
-			break;
-		case 'BADMINTON-OPTIONS':
-			valueToProcess = $('#select_sports option:selected').val();
-			break;
-		case 'CRICKET-OPTIONS':
-			valueToProcess = $('#select_sports option:selected').val();
-			break;
-		case 'FOOTBALL-OPTIONS':
-			valueToProcess = $('#select_sports option:selected').val();
-			break;
-		case 'READ-DATA-AND-PREVIEW':
-			valueToProcess =$('#previous_xml_data option:selected').val();
-			break;
-		case 'PREVIEW':
-			valueToProcess = $('#selectedScene option:selected').val();
-			break;	
-		case 'LOAD_CONTAINER':
-			valueToProcess =$('#previous_xml_data option:selected').val();
-			break;
-		case 'READ-MATCH-AND-POPULATE':
-			if(previous_data == 'preview'){
-				previous_data = '';
-				processManualProcedures('PREVIEW');
-			}
-			break;		
-    	}
-		break;
-	}
-	
-	$.ajax({    
-        type : 'Get',     
-        url : 'processManualProcedures.html',     
-        data : 'whatToProcess=' + whatToProcess + '&valueToProcess=' + valueToProcess, 
-        dataType : 'json',
-        success : function(data) {
-			switch(whatToProcess) {
-			case 'LOAD_DATA':
-				addItemsToList('LOAD_DATA-OPTIONS',data);
-				break;
-			case 'LOAD_SCENE':
-				if($('#selectedScene option:selected').val().includes('_Rows_') || 
-						$('#selectedScene option:selected').val().includes('_Row_')){
-					addItemsToList('ROWS_COLUMN-OPTIONS',data);
-				}
-				break;
-			case'PREVIEW_IMAGE_DATA':
-				addItemsToList('PREVIEW_IMAGE_TO_DIV',data);
-			 	break;	
-			case "CHECK_CONNECTION":	
-				addItemsToList('CONNECTION_TO_DIV',data);
-			break;
-			/*case 'PREVIEW':
-				document.getElementById('preview_image').src = URL.createObjectURL(new Blob(["C://Temp//Preview.png"], {type: "image/png"}));
-				break;*/
-			/*case 'ANIMATE-IN':
-				addItemsToList('LOAD_PREVIOUS_SCENE-OPTIONS',data);
-				break;*/	
-			case 'LOAD_PREVIOUS_SCENE':
-				if(confirm('Animate In?') == true){
-					processManualProcedures('ANIMATE-IN');
-					addItemsToList('LOAD_PREVIOUS_SCENE-OPTIONS',data);
-				}else{
-					document.initialise_form.submit();
-				}
-				break;
-			case 'LOAD_CONTAINER':
-				addItemsToList('LOAD_PREVIOUS_SCENE-OPTIONS',data);
-				break;
-			}
-			processWaitingButtonSpinner('END_WAIT_TIMER');
-	    },    
-	    error : function(e) {    
-	  	 	console.log('Error occured in ' + whatToProcess + ' with error description = ' + e);     
-	    }    
-	});
+function processManualProcedures(whatToProcess, valueToProcess) {
+
+    // Determine valueToProcess from DOM if not passed in
+    if (valueToProcess === undefined || valueToProcess === null) {
+        switch (whatToProcess) {
+        case 'LOAD_SCENE':
+            valueToProcess = $('#selectedScene option:selected').val();
+            break;
+        case 'LOAD_PREVIOUS_SCENE':
+            valueToProcess = $('#previous_xml_data option:selected').val();
+            break;
+        case 'LOAD_DATA':
+            if ($('#selectedScene option:selected').val().includes('_Rows_')) {
+                valueToProcess = $('#selectedScene option:selected').val() + "," + $('#rows').val() + "," + $('#column').val();
+                $('#RowCol_stats_div').empty();
+                $('#RowCol_stats_div').css('display', 'none');
+            } else {
+                valueToProcess = $('#selectedScene option:selected').val();
+            }
+            break;
+        case 'BADMINTON-OPTIONS':
+        case 'CRICKET-OPTIONS':
+        case 'FOOTBALL-OPTIONS':
+            valueToProcess = $('#select_sports option:selected').val();
+            break;
+        case 'READ-DATA-AND-PREVIEW':
+        case 'LOAD_CONTAINER':
+            valueToProcess = $('#previous_xml_data option:selected').val();
+            break;
+        case 'PREVIEW':
+            valueToProcess = $('#selectedScene option:selected').val();
+            break;
+        case 'READ-MATCH-AND-POPULATE':
+            if (previous_data == 'preview') {
+                previous_data = '';
+                processManualProcedures('PREVIEW');
+            }
+            return; // no AJAX needed
+        default:
+            valueToProcess = '';
+        }
+    }
+
+    valueToProcess = valueToProcess || '';
+
+    $.ajax({
+        type: 'POST',
+        url: 'processManualProcedures',
+        data: {
+            whatToProcess: whatToProcess,
+            valueToProcess: valueToProcess
+        },
+        dataType: 'json',
+        success: function (data) {
+            switch (whatToProcess) {
+            case 'LOAD_DATA':
+                addItemsToList('LOAD_DATA-OPTIONS', data);
+                break;
+            case 'LOAD_SCENE':
+                if ($('#selectedScene option:selected').val().includes('_Rows_') ||
+                    $('#selectedScene option:selected').val().includes('_Row_')) {
+                    addItemsToList('ROWS_COLUMN-OPTIONS', data);
+                }
+                break;
+            case 'PREVIEW_IMAGE_DATA':
+            case 'PREVIEW-IN':
+                addItemsToList('PREVIEW_IMAGE_TO_DIV', data);
+                break;
+            case 'CHECK_CONNECTION':
+                addItemsToList('CONNECTION_TO_DIV', data);
+                break;
+            case 'LOAD_PREVIOUS_SCENE':
+                if (confirm('Animate In?') == true) {
+                    processManualProcedures('ANIMATE-IN');
+                    addItemsToList('LOAD_PREVIOUS_SCENE-OPTIONS', data);
+                } else {
+                    document.initialise_form.submit();
+                }
+                break;
+            case 'LOAD_CONTAINER':
+                addItemsToList('LOAD_PREVIOUS_SCENE-OPTIONS', data);
+                break;
+            }
+            processWaitingButtonSpinner('END_WAIT_TIMER');
+        },
+        error: function (xhr, status, error) {
+            console.error("Error occured in " + whatToProcess +
+                " with error description = " + xhr.status + " " + xhr.statusText);
+        }
+    });
 }
 function addItemsToList(whatToProcess, dataToProcess){
 
@@ -493,7 +486,9 @@ function addItemsToList(whatToProcess, dataToProcess){
 			select = document.createElement('button');
 			select.innerHTML = '<b>Save XML</b>';
 			select.id = 'save_button';
-			select.className = 'btn btn-success position-absolute top-0 start-50 translate-middle-x shadow-lg';
+			select.className = 'btn action-btn save-btn';
+			select.style.backgroundColor = 'blue'; // background color
+			select.style.color = 'white'; 
 	        select.style.padding = '4px 8px'; // Adjust padding
 	        select.style.fontSize = window.innerWidth <= 480 ? '1.2rem' : window.innerWidth <= 768 ? '1.2rem' : '1.9rem';
 	        select.style.borderRadius = '8px'; // Rounded corners
@@ -521,7 +516,9 @@ function addItemsToList(whatToProcess, dataToProcess){
 			var cancelButton = document.createElement('button');
 			cancelButton.innerHTML = '<b>Cancel</b>';
 			cancelButton.id = 'cancel_graphics_btn';
-		 	cancelButton.className = 'btn btn-danger position-absolute top-0 start-50 translate-middle-x shadow-lg';
+		 	cancelButton.className = 'btn action-btn cancel-btn';
+			cancelButton.style.color = 'white'; 
+			cancelButton.style.backgroundColor = 'red'; // color
 	        cancelButton.style.padding = '4px 8px'; // Adjust padding
 	        cancelButton.style.fontSize =  window.innerWidth <= 480 ? '1.2rem' : window.innerWidth <= 768 ? '1.2rem' : '1.9rem';
 	        cancelButton.style.borderRadius = '8px'; // Rounded corners
@@ -624,8 +621,10 @@ function addItemsToList(whatToProcess, dataToProcess){
 				select = document.createElement('button');
 				select.innerHTML = 'Save As';
 				select.id = 'save_button';
-				select.className = 'btn btn-success position-absolute top-0 start-50 translate-middle-x shadow-lg';
+				select.className = 'btn action-btn save-btn';
 		        select.style.padding = '4px 8px'; // Adjust padding
+				select.style.backgroundColor = 'blue'; // color
+				select.style.color = 'white'; 
 		        select.style.fontSize = '16px'; // Font size
 		        select.style.borderRadius = '8px'; // Rounded corners
 		        select.style.transition = 'all 0.3s ease'; // Smooth transition
@@ -652,8 +651,10 @@ function addItemsToList(whatToProcess, dataToProcess){
 				var cancelButton = document.createElement('button');
 				cancelButton.innerHTML = '<b>Cancel</b>';
 				cancelButton.id = 'cancel_graphics_btn';
-			 	cancelButton.className = 'btn btn-danger position-absolute top-0 start-50 translate-middle-x shadow-lg';
+			 	cancelButton.className = 'btn action-btn cancel-btn';
 		        cancelButton.style.padding = '4px 8px'; // Adjust padding
+				cancelButton.style.backgroundColor = 'red'; // color
+				cancelButton.style.color = 'white'; 
 		        cancelButton.style.fontSize = '16px'; // Font size
 		        cancelButton.style.borderRadius = '8px'; // Rounded corners
 		        cancelButton.style.transition = 'all 0.3s ease'; // Smooth transition

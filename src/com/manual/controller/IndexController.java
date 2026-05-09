@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,7 +101,7 @@ public class IndexController
 	}
 
 	@RequestMapping(value = {"/manual"}, method={RequestMethod.GET,RequestMethod.POST}) 
-	public String manualPage(ModelMap model, MultipartHttpServletRequest request,
+	public String manualPage(ModelMap model, HttpServletRequest  request,
 			@ModelAttribute("expiryDate") String expiryDate,
 			@RequestParam(value = "select_sports", required = false, defaultValue = "") String select_sports,
 			@RequestParam(value = "vizIPAddressEverest", required = false, defaultValue = "") String vizIPAddressEverest,
@@ -700,7 +702,7 @@ public class IndexController
 				}
 				
 				 json.put("connection_type", connection);
-			    return json.toString();
+			    return new ObjectMapper().writeValueAsString(json);
 			}
 		
 		default:
