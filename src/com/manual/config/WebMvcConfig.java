@@ -24,7 +24,7 @@ import org.springframework.web.servlet.view.JstlView;
         "com.manual.service.impl"
 })
 @Import({ DataSourceConfig.class })
-@PropertySource("classpath:db.properties")
+//@PropertySource("classpath:db.properties")
 public class WebMvcConfig implements WebMvcConfigurer {
 
     @Resource
