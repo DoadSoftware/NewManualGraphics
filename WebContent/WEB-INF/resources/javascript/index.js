@@ -154,7 +154,7 @@ function userSelectionData(whatToProcess,dataToProcess){
 		break;	
 	}
 }
-function uploadFormDataToSessionObjects(whatToProcess,whichInput)
+/*function uploadFormDataToSessionObjects(whatToProcess,whichInput)
 {
 	var idOfImagebutton = whichInput;
 	var formData = new FormData();
@@ -195,8 +195,8 @@ function uploadFormDataToSessionObjects(whatToProcess,whichInput)
         processData: false,
         type: 'POST',     
         success : function(data) {
-				/*document.getElementById('preview_image').href = URL.createObjectURL(new File([data], {type: "image/png"}));
-		        document.getElementById('preview_image').innerHTML = 'hi';*/
+				document.getElementById('preview_image').href = URL.createObjectURL(new File([data], {type: "image/png"}));
+		        document.getElementById('preview_image').innerHTML = 'hi';
         },    
         error : function(e) {    
        	 	console.log('Error occured in uploadFormDataToSessionObjects with error description = ' + e);     
@@ -218,6 +218,85 @@ function uploadFormDataToSessionObjects(whatToProcess,whichInput)
 		break;				
 	}	
 	
+}*/
+function uploadFormDataToSessionObjects(whatToProcess, whichInput) {
+
+    var idOfImagebutton = whichInput;
+    var formData = new FormData();
+    var url_path;
+
+    switch (whatToProcess.toUpperCase()) {
+
+        case 'SAVE_DATA':
+        case 'SAVE_FILE':
+            $('input, select, textarea').each(function () {
+                var id = $(this).attr('id');
+                // FIX Bug 1: skip elements with no id
+                if (!id) return;
+                var el = document.getElementById(id);
+                if (!el) return;
+                formData.append(id, el.value);
+            });
+            url_path = 'save_data';
+            formData.append('file_name', document.getElementById('file_name').value);
+            break;
+
+        case 'MATCH_PREVIEW':
+            $('input, select, textarea').each(function () {
+                var id = $(this).attr('id');
+                // FIX Bug 1: skip elements with no id
+                if (!id) return;
+                var el = document.getElementById(id);
+                if (!el) return;
+                formData.append(id, el.value);
+            });
+            url_path = 'preview';
+            formData.append('file_name', document.getElementById('file_name').value);
+            break;
+
+        case 'FILE':
+            url_path = 'uploadFileToManual';
+            formData.append(idOfImagebutton, document.getElementById(whichInput).files[0]);
+            break;
+    }
+
+    $.ajax({
+        headers: { 'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content') },
+        url: url_path,
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        type: 'POST',
+
+        // FIX Bug 2 & 3: all post-save/post-upload logic goes INSIDE success callback
+        success: function (data) {
+            switch (whatToProcess.toUpperCase()) {
+
+                case 'SAVE_DATA':
+                    // FIX Bug 2: alert and redirect only AFTER server confirms save
+                    alert("File Successfully Saved");
+                    document.manual_form.method = 'post';
+                    document.manual_form.action = 'back_to_manual';
+                    document.manual_form.submit();
+                    break;
+
+                case 'SAVE_FILE':
+                    previous_data = 'preview';
+                    break;
+
+                case 'FILE':
+                    // FIX Bug 3: trigger preview only AFTER upload is confirmed complete
+                    uploadFormDataToSessionObjects('MATCH_PREVIEW', null);
+                    break;
+            }
+        },
+
+        error: function (e) {
+            console.log('Error in uploadFormDataToSessionObjects: ' + e.status + ' ' + e.statusText);
+            alert('An error occurred. Please check the console for details.');
+        }
+    });
 }
 function processManualProcedures(whatToProcess, valueToProcess) {
 

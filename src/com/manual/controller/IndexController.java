@@ -261,6 +261,7 @@ public class IndexController
 				List<Container> containers = new ArrayList<Container>();
 				containers.clear();
 				for (Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
+					//System.out.println("entry.getKey() = " + entry.getKey());
 					if(entry.getKey().contains("previous_xml_data") || entry.getKey().contains("selectedScene") 
 							|| entry.getKey().contains("manual_file_timestamp") 
 							|| entry.getKey().contains("select_sport")) {
@@ -304,10 +305,20 @@ public class IndexController
 						file_name = entry.getValue()[0];
 					}
 					else {
-						containers.add(new Container(Integer.valueOf(entry.getKey().split("_")[0]), entry.getKey(), entry.getValue()[0]));
+					    String prefix = entry.getKey().split("_")[0];
+					    try {
+					        containers.add(new Container(
+					            Integer.valueOf(prefix),
+					            entry.getKey(),
+					            entry.getValue()[0]
+					        ));
+					    } catch (NumberFormatException e) {
+					        System.out.println("Skipping non-container key: " + entry.getKey());
+					    }
 					}		
 				}
 				Collections.sort(containers);
+				//System.out.println("request.getRequestURI() = " + request.getRequestURI());
 				if(request.getRequestURI().contains("save_data")) {
 					
 					String basePath = session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || 
@@ -341,41 +352,65 @@ public class IndexController
 				
 			}else if (request.getRequestURI().contains("uploadFileToManual")) {
 				
-				 Iterator<String> fileItr = request.getFileNames();
+				Iterator<String> fileItr = request.getFileNames();
 				 
-				 if (fileItr.hasNext()) {
+//				if (fileItr.hasNext()) {
 					 
-					 whichFile = request.getFileMap().entrySet().iterator().next().getKey();
-					 
-					 if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-						if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
-							imgdata.add(new ImageData(whichFile,ManualUtil.MANUAL_MEDIA_DIRECTORY_PATH + 
-									"DOAD" + "_" + request.getFileMap().entrySet().iterator().next().getValue().getOriginalFilename()));
+					while (fileItr.hasNext()) {
+						 
+						String fileKey = fileItr.next();
+						
+						mpf = request.getFile(fileKey);
+						
+						if(mpf == null || mpf.isEmpty()) {
+							continue;
 						}
 						
-					}else {
-						imgdata.add(new ImageData(whichFile,"//" + session_Configurations.getIpAddressScenes() + "/" + ManualUtil.MANUAL_MEDIA_DIRECTORY_PATH.replace("C:", "c") + 
-								"DOAD" + "_" + request.getFileMap().entrySet().iterator().next().getValue().getOriginalFilename()));
-					}
-					 
-					 while (fileItr.hasNext()) {
-						 
-						mpf = request.getFile(fileItr.next());
-						if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-							if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
-								file = new File(ManualUtil.MANUAL_MEDIA_DIRECTORY_PATH + 
-										"DOAD" + "_" + request.getFileMap().entrySet().iterator().next().getValue().getOriginalFilename());
+						whichFile = fileKey;
+						
+						String originalFileName = mpf.getOriginalFilename();
+						
+						if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || 
+								session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
+							
+							if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && 
+									session_Configurations.getPortNumber() != 0) {
+								
+								imgdata.add(new ImageData(whichFile,ManualUtil.MANUAL_MEDIA_DIRECTORY_PATH + "DOAD" + "_" + originalFileName));
+								
+								file = new File(ManualUtil.MANUAL_MEDIA_DIRECTORY_PATH + "DOAD" + "_" + originalFileName);
+								
+								File parentDir = file.getParentFile();
+								
+								if(parentDir != null && !parentDir.exists()) {
+									parentDir.mkdirs();
+								}
+								
 								mpf.transferTo(file);
 							}
 							
 						}else {
-							file = new File("//" + session_Configurations.getIpAddressScenes() + "/" + ManualUtil.MANUAL_MEDIA_DIRECTORY_PATH.replace("C:", "c") + 
-									"DOAD" + "_" + request.getFileMap().entrySet().iterator().next().getValue().getOriginalFilename());
+							
+							imgdata.add(
+								new ImageData(whichFile,"//" + session_Configurations.getIpAddressScenes() + "/" + ManualUtil.MANUAL_MEDIA_DIRECTORY_PATH.replace("C:", "c") + 
+									"DOAD" + "_" + originalFileName));
+							
+							file = new File(
+								"//" + session_Configurations.getIpAddressScenes() + "/" + 
+								ManualUtil.MANUAL_MEDIA_DIRECTORY_PATH.replace("C:", "c") + 
+								"DOAD" + "_" + originalFileName);
+							
+							File parentDir = file.getParentFile();
+							
+							if(parentDir != null && !parentDir.exists()) {
+								parentDir.mkdirs();
+							}
+							
 							mpf.transferTo(file);
 						}
-					 }
-				  }
-		      }
+					}
+//				}
+			}
 			
 		return  objectMapper.writeValueAsString(session_Data);
 	}
