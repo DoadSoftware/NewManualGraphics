@@ -83,7 +83,6 @@
       }
     });
     $(document).ready(function() {
-
         // select2 fires 'select2:select' not native 'change'
         $('#previous_xml_data').on('select2:select', function() {
             processManualProcedures('READ-DATA-AND-PREVIEW', $(this).val());

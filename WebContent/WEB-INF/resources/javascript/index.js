@@ -39,6 +39,7 @@ function initialisePage(whichPage)
 }
 function processPreviewSelection(whichInput)
 {
+	console.log('$(whichInput).attr = ' + $(whichInput).attr('id'));
 	if($(whichInput).attr('id').includes('Logo') ||$(whichInput).attr('id').includes('Sponsor')|| $(whichInput).attr('id').includes('Image')){
 		uploadFormDataToSessionObjects('file',$(whichInput).attr('id'));
 	}else{
@@ -60,6 +61,7 @@ function processUserSelection(whichInput)
 			processManualProcedures('LOAD_SCENE');
 			break;
 		case 'get_container_btn':
+			console.log('1');
 			processManualProcedures('LOAD_DATA');
 			break;
 		case 'save_button':
@@ -154,7 +156,7 @@ function userSelectionData(whatToProcess,dataToProcess){
 		break;	
 	}
 }
-/*function uploadFormDataToSessionObjects(whatToProcess,whichInput)
+function uploadFormDataToSessionObjects(whatToProcess,whichInput)
 {
 	var idOfImagebutton = whichInput;
 	var formData = new FormData();
@@ -195,8 +197,6 @@ function userSelectionData(whatToProcess,dataToProcess){
         processData: false,
         type: 'POST',     
         success : function(data) {
-				document.getElementById('preview_image').href = URL.createObjectURL(new File([data], {type: "image/png"}));
-		        document.getElementById('preview_image').innerHTML = 'hi';
         },    
         error : function(e) {    
        	 	console.log('Error occured in uploadFormDataToSessionObjects with error description = ' + e);     
@@ -218,8 +218,8 @@ function userSelectionData(whatToProcess,dataToProcess){
 		break;				
 	}	
 	
-}*/
-function uploadFormDataToSessionObjects(whatToProcess, whichInput) {
+}
+/*function uploadFormDataToSessionObjects(whatToProcess, whichInput) {
 
     var idOfImagebutton = whichInput;
     var formData = new FormData();
@@ -297,7 +297,7 @@ function uploadFormDataToSessionObjects(whatToProcess, whichInput) {
             alert('An error occurred. Please check the console for details.');
         }
     });
-}
+}*/
 function processManualProcedures(whatToProcess, valueToProcess) {
 
     // Determine valueToProcess from DOM if not passed in
@@ -310,7 +310,8 @@ function processManualProcedures(whatToProcess, valueToProcess) {
             valueToProcess = $('#previous_xml_data option:selected').val();
             break;
         case 'LOAD_DATA':
-            if ($('#selectedScene option:selected').val().includes('_Rows_')) {
+            if ($('#selectedScene option:selected').val().includes('_Rows_') || 
+				$('#selectedScene option:selected').val().includes('_Row_')) {
                 valueToProcess = $('#selectedScene option:selected').val() + "," + $('#rows').val() + "," + $('#column').val();
                 $('#RowCol_stats_div').empty();
                 $('#RowCol_stats_div').css('display', 'none');
@@ -340,7 +341,7 @@ function processManualProcedures(whatToProcess, valueToProcess) {
             valueToProcess = '';
         }
     }
-
+	
     valueToProcess = valueToProcess || '';
 
     $.ajax({
@@ -430,17 +431,17 @@ function addItemsToList(whatToProcess, dataToProcess){
 	break;
 	
    case "PREVIEW_IMAGE_TO_DIV":
-    if (dataToProcess.file_data) {
-    // Convert Base64 to Data URL and set it as the image source
-	    document.getElementById('preview_img').src =
-	        "data:" + dataToProcess.content_type + ";base64," + dataToProcess.file_data;
+	    if (dataToProcess.file_data) {
+	    // Convert Base64 to Data URL and set it as the image source
+		    document.getElementById('preview_img').src =
+		        "data:" + dataToProcess.content_type + ";base64," + dataToProcess.file_data;
+		
+		    document.getElementById('preview_image_div').style.display = 'block';
+		} else {
+		    console.error("Error: File does not exist.");
+		}
 	
-	    document.getElementById('preview_image_div').style.display = 'block';
-	} else {
-	    console.error("Error: File does not exist.");
-	}
-
-    break;
+	    break;
 	case 'ROWS_COLUMN-OPTIONS':
 		$('#RowCol_stats_div').empty();
 	    table = document.createElement('table');

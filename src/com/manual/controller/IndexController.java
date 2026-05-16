@@ -261,7 +261,7 @@ public class IndexController
 				List<Container> containers = new ArrayList<Container>();
 				containers.clear();
 				for (Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-					//System.out.println("entry.getKey() = " + entry.getKey());
+					System.out.println("entry.getKey() = " + entry.getKey());
 					if(entry.getKey().contains("previous_xml_data") || entry.getKey().contains("selectedScene") 
 							|| entry.getKey().contains("manual_file_timestamp") 
 							|| entry.getKey().contains("select_sport")) {
@@ -306,6 +306,11 @@ public class IndexController
 					}
 					else {
 					    String prefix = entry.getKey().split("_")[0];
+//					    containers.add(new Container(
+//					            Integer.valueOf(prefix),
+//					            entry.getKey(),
+//					            entry.getValue()[0]
+//					        ));
 					    try {
 					        containers.add(new Container(
 					            Integer.valueOf(prefix),
@@ -423,7 +428,7 @@ public class IndexController
 					throws IOException, IllegalAccessException, InvocationTargetException, JAXBException, InterruptedException
 	{	
 		Map<String, String> json = new HashMap<>();
-		
+		System.out.println("whatToProcess = " + whatToProcess + "    valueToProcess = " + valueToProcess);
 		switch (whatToProcess.toUpperCase()) {
 		case "BUILD_CONNECTION":
 			print_writer = new PrintWriter(new Socket(session_Configurations.getIpAddressEverest(), 
@@ -591,8 +596,11 @@ public class IndexController
 				//Rows and columns with unwanted tags removed
 					if(valueToProcess.contains(",")) {
 						print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 138.0;");
-						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vRows " +valueToProcess.split(",")[2]+ ";");
-						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vCoumms " +valueToProcess.split(",")[1]+ ";");
+						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vSelectRows " +valueToProcess.split(",")[2]+ ";");
+						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vSelectColumm " +valueToProcess.split(",")[1]+ ";");
+						
+						TimeUnit.MILLISECONDS.sleep(800);
+						
 						print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE_ACTIVE_ONLY " +
 								ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
 						print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
@@ -602,8 +610,11 @@ public class IndexController
 						TimeUnit.MILLISECONDS.sleep(400);
 						
 						print_writer.println("LAYER6*EVEREST*STAGE*DIRECTOR*In SHOW 138.0;");
-						print_writer.println("LAYER6*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vRows " +valueToProcess.split(",")[2]+ ";");
-						print_writer.println("LAYER6*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vCoumms " +valueToProcess.split(",")[1]+ ";");
+						print_writer.println("LAYER6*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vSelectRows " +valueToProcess.split(",")[2]+ ";");
+						print_writer.println("LAYER6*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vSelectColumm " +valueToProcess.split(",")[1]+ ";");
+						
+						TimeUnit.MILLISECONDS.sleep(800);
+						
 						print_writer.println("LAYER6*EVEREST*GLOBAL TEMPLATE_SAVE_ACTIVE_ONLY " +
 								ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
 						print_writer.println("LAYER6*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
@@ -646,8 +657,11 @@ public class IndexController
 //			        }
 					if(valueToProcess.contains(",")) {
 						print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 138.0;");
-						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vRows " +valueToProcess.split(",")[2]+ ";");
-						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vCoumms " +valueToProcess.split(",")[1]+ ";");
+						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vSelectRows " +valueToProcess.split(",")[2]+ ";");
+						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vSelectColumm " +valueToProcess.split(",")[1]+ ";");
+						
+						TimeUnit.MILLISECONDS.sleep(800);
+						
 						print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE_ACTIVE_ONLY " + "//" + session_Configurations.getIpAddressScenes() + "//" + 
 								ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.CONTAINER_FILE + ";");
 						print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
@@ -655,8 +669,11 @@ public class IndexController
 						TimeUnit.SECONDS.sleep(200);
 						
 						print_writer.println("LAYER6*EVEREST*STAGE*DIRECTOR*In SHOW 138.0;");
-						print_writer.println("LAYER6*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vRows " +valueToProcess.split(",")[2]+ ";");
-						print_writer.println("LAYER6*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vCoumms " +valueToProcess.split(",")[1]+ ";");
+						print_writer.println("LAYER6*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vSelectRows " +valueToProcess.split(",")[2]+ ";");
+						print_writer.println("LAYER6*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vSelectColumm " +valueToProcess.split(",")[1]+ ";");
+						
+						TimeUnit.MILLISECONDS.sleep(800);
+						
 						print_writer.println("LAYER6*EVEREST*GLOBAL TEMPLATE_SAVE_ACTIVE_ONLY " + "//" + session_Configurations.getIpAddressScenes() + "//" + 
 								ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.CONTAINER_FILE + ";");
 						print_writer.println("LAYER6*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
@@ -692,10 +709,11 @@ public class IndexController
 				}
 			case "PREVIEW_IMAGE_DATA": case "PREVIEW-IN":
 				Path filePath = session_Configurations.getIpAddressEverest().equalsIgnoreCase("LOCALHOST")
-			        ? Paths.get("D:\\layer6_snapshot.png")
-			        : Paths.get("\\\\" + session_Configurations.getIpAddressEverest() + "\\d\\layer6_snapshot.png");
+			        ? Paths.get("C:\\Temp\\Preview.png")
+			        : Paths.get("\\\\" + session_Configurations.getIpAddressEverest() + "\\c\\Temp\\Preview.png");
 
 				if (Files.exists(filePath)) {
+					System.out.println("preview");
 				    json.put("file_data", Base64.getEncoder().encodeToString(Files.readAllBytes(filePath)));
 				    json.put("content_type", "image/PNG");
 				    return objectMapper.writeValueAsString(json);
@@ -710,7 +728,10 @@ public class IndexController
 //			        json.put("content_type", "image/PNG");
 //			        return json.toString();
 //			    }
-			    return "Preview Image does not exist."; 			
+			    //return "Preview Image does not exist.";
+				json.put("file_data", null);
+				json.put("message", "Preview Image does not exist.");
+				return objectMapper.writeValueAsString(json);
 			}
 			switch (whatToProcess.toUpperCase()) {
 			
@@ -728,16 +749,32 @@ public class IndexController
 				print_writer.println("LAYER1*EVEREST*SINGLE_SCENE CLEAR;");
 				IsGraphicOnScreen = false;
 				return objectMapper.writeValueAsString(null);
-			
 			case "CHECK_CONNECTION":
-				if(session_Configurations != null) {
-					connection = session_Configurations.getIpAddressEverest().equalsIgnoreCase("LOCALHOST")? 
-							ManualFunctions.checkConnection("127.0.0.1", session_Configurations.getPortNumber(), 1000): ManualFunctions.checkConnection(session_Configurations.getIpAddressEverest(),
-									session_Configurations.getPortNumber(), 1000);
-				}
-				
-				 json.put("connection_type", connection);
-			    return new ObjectMapper().writeValueAsString(json);
+			    if (session_Configurations != null 
+			            && !session_Configurations.getIpAddressEverest().trim().isEmpty()) {
+			        connection = session_Configurations.getIpAddressEverest()
+			                .equalsIgnoreCase("LOCALHOST")
+			                ? ManualFunctions.checkConnection("127.0.0.1", 
+			                    session_Configurations.getPortNumber(), 1000)
+			                : ManualFunctions.checkConnection(
+			                    session_Configurations.getIpAddressEverest(),
+			                    session_Configurations.getPortNumber(), 1000);
+			        json.put("connection_type", connection);
+			    } else {
+			        // Not configured yet — return null silently, no log spam
+			        json.put("connection_type", "DISCONNECTED");
+			    }
+			    return objectMapper.writeValueAsString(json);	
+			
+//			case "CHECK_CONNECTION":
+//				if(session_Configurations != null) {
+//					connection = session_Configurations.getIpAddressEverest().equalsIgnoreCase("LOCALHOST")? 
+//							ManualFunctions.checkConnection("127.0.0.1", session_Configurations.getPortNumber(), 1000): ManualFunctions.checkConnection(session_Configurations.getIpAddressEverest(),
+//									session_Configurations.getPortNumber(), 1000);
+//				}
+//				
+//				 json.put("connection_type", connection);
+//			    return new ObjectMapper().writeValueAsString(json);
 			}
 		
 		default:
