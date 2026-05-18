@@ -125,6 +125,12 @@ function processUserSelection(whichInput)
 				  break;*/
 			}
 			break;
+		case 'sdiOn_btn':
+			processManualProcedures('SDI_ON');
+			break;
+		case 'sdiOff_btn':
+			processManualProcedures('SDI_OFF');
+			break;		
 		}
 	}
 }	
@@ -431,6 +437,7 @@ function addItemsToList(whatToProcess, dataToProcess){
 	break;
 	
    case "PREVIEW_IMAGE_TO_DIV":
+		console.log(dataToProcess);
 	    if (dataToProcess.file_data) {
 	    // Convert Base64 to Data URL and set it as the image source
 		    document.getElementById('preview_img').src =

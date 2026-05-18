@@ -5,12 +5,19 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
+
+import com.manual.model.Configurations;
+import com.manual.model.Scene;
 
 public class ManualFunctions 
 {
-	public static String Preview(String selected_sports,String scene, PrintWriter print_writer, boolean isGraphicOnScreen) throws InterruptedException
+	public static String Preview(String selected_sports,String scene, PrintWriter print_writer, boolean isGraphicOnScreen,Configurations session_Configurations) throws InterruptedException
     {
+		TimeUnit.MILLISECONDS.sleep(500);
+		String path = "C:\\Temp\\Preview.png";
 		//scene = scene.replace(".sum", "");
 		switch(selected_sports.toUpperCase()) {
 			case "BADMINTON":
@@ -20,9 +27,22 @@ public class ManualFunctions
 				} 
 				break;
 		}
-		print_writer.println("LAYER1*EVEREST*SINGLE_SCENE LOAD C:\\DOAD_In_House_Everest\\Manual\\Scenes\\" + scene + ".sum;");
-		print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 190;");
-		print_writer.println("LAYER1*EVEREST*GLOBAL OFFSCREEN_SNAPSHOT ON;");
+		
+		if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("LOCALHOST")) {
+			path = "C:\\Temp\\Preview.png";
+		}else {
+			path = "\\\\" + session_Configurations.getIpAddressEverest() + "\\c\\Temp\\Preview.png";
+		}
+		
+//		if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
+//			print_writer.println("LAYER6*EVEREST*SINGLE_SCENE LOAD " + ManualUtil.SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + scene + ".sum;");
+//		}else {
+//			print_writer.println("LAYER6*EVEREST*SINGLE_SCENE LOAD " + "//" + session_Configurations.getIpAddressScenes() +
+//					"//" + ManualUtil.SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY + scene + ".sum;");
+//		}
+//		
+//		print_writer.println("LAYER6*EVEREST*STAGE*DIRECTOR*In SHOW 190;");
+//		print_writer.println("LAYER6*EVEREST*GLOBAL OFFSCREEN_SNAPSHOT ON;");
 		
 		print_writer.println("LAYER1*EVEREST*GLOBAL PREVIEW ON;");
 		print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In STOP;");
@@ -34,7 +54,7 @@ public class ManualFunctions
 			print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 144.0;");
 		}
 		print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*Out SHOW 0.0;");
-		print_writer.println("LAYER1*EVEREST*GLOBAL SNAPSHOT_PATH C:/Temp/Preview.png;");
+		print_writer.println("LAYER1*EVEREST*GLOBAL SNAPSHOT_PATH " + path + ";");
 		print_writer.println("LAYER1*EVEREST*GLOBAL SNAPSHOT 1920 1080;");
 		print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*Out SHOW 0.0;");
 		if(!isGraphicOnScreen) {

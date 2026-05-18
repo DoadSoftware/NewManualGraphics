@@ -352,7 +352,7 @@ public class IndexController
 					}
 					TimeUnit.SECONDS.sleep(1);
 					Scene = containers.get(0).getContainer_value().split("/")[ containers.get(0).getContainer_value().split("/").length-1].replace(".sum", "");
-					ManualFunctions.Preview(session_selected_sports,Scene, print_writer ,IsGraphicOnScreen);
+					ManualFunctions.Preview(session_selected_sports,Scene, print_writer ,IsGraphicOnScreen,session_Configurations);
 				}
 				
 			}else if (request.getRequestURI().contains("uploadFileToManual")) {
@@ -428,12 +428,18 @@ public class IndexController
 					throws IOException, IllegalAccessException, InvocationTargetException, JAXBException, InterruptedException
 	{	
 		Map<String, String> json = new HashMap<>();
-		System.out.println("whatToProcess = " + whatToProcess + "    valueToProcess = " + valueToProcess);
+		//System.out.println("whatToProcess = " + whatToProcess + "    valueToProcess = " + valueToProcess);
 		switch (whatToProcess.toUpperCase()) {
 		case "BUILD_CONNECTION":
 			print_writer = new PrintWriter(new Socket(session_Configurations.getIpAddressEverest(), 
 				session_Configurations.getPortNumber()).getOutputStream(), true);
 			return null;
+		case "SDI_ON":
+			print_writer.println("LAYER1*EVEREST*GLOBAL SDI_OUTPUT ON;");
+			return null;
+		case "SDI_OFF":
+			print_writer.println("LAYER1*EVEREST*GLOBAL SDI_OUTPUT OFF;");
+			return null;	
 		case "LOAD_SCENE": case "LOAD_DATA": case "CHECK_CONNECTION":case "LOAD_PREVIOUS_SCENE": case "ANIMATE-OUT": case "ANIMATE-IN": case "CLEAR-ALL": case "BADMINTON-OPTIONS": 
 		case "READ-DATA-AND-PREVIEW": case "LOAD_CONTAINER": case "PREVIEW":case "MATCH_PREVIEW":case"PREVIEW_IMAGE_DATA": case "PREVIEW-IN":
 			switch(whatToProcess.toUpperCase()) {
@@ -467,7 +473,7 @@ public class IndexController
 					new Scene(session_Data.getContainers().get(0).getContainer_value().replace("C:", "c")).
 							scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value().replace("C:", "c"));
 				}
-				ManualFunctions.Preview(session_selected_sports,Scene, print_writer ,IsGraphicOnScreen);
+				ManualFunctions.Preview(session_selected_sports,Scene, print_writer ,IsGraphicOnScreen,session_Configurations);
 				
 				return objectMapper.writeValueAsString(session_Data);
 		
@@ -529,7 +535,7 @@ public class IndexController
 						Scene = valueToProcess.replace(".xml", ".sum");
 					}
 					
-					ManualFunctions.Preview(session_selected_sports,Scene, print_writer ,IsGraphicOnScreen);
+					ManualFunctions.Preview(session_selected_sports,Scene, print_writer ,IsGraphicOnScreen,session_Configurations);
 					
 					return  objectMapper.writeValueAsString(session_Data);
 				}
@@ -546,7 +552,7 @@ public class IndexController
 									"//" + ManualUtil.SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY + valueToProcess);
 				}
 				
-				ManualFunctions.Preview(session_selected_sports,"", print_writer,false);
+				ManualFunctions.Preview(session_selected_sports,"", print_writer,false,session_Configurations);
 				break;
 			}
 			
@@ -574,7 +580,7 @@ public class IndexController
 					print_writer.println("LAYER6*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET " + session_Data.getContainers().get(i).getContainer_key().replaceFirst((i)+"_", "") + " " + 
 							session_Data.getContainers().get(i).getContainer_value() + ";");
 				}
-				ManualFunctions.Preview(session_selected_sports,Scene, print_writer,IsGraphicOnScreen);
+				ManualFunctions.Preview(session_selected_sports,Scene, print_writer,IsGraphicOnScreen,session_Configurations);
 				return  objectMapper.writeValueAsString(session_Data);
 				
 			case "LOAD_DATA":
@@ -716,6 +722,9 @@ public class IndexController
 					System.out.println("preview");
 				    json.put("file_data", Base64.getEncoder().encodeToString(Files.readAllBytes(filePath)));
 				    json.put("content_type", "image/PNG");
+				    
+				    ManualFunctions.Preview(session_selected_sports,Scene, print_writer,IsGraphicOnScreen,session_Configurations);
+				    
 				    return objectMapper.writeValueAsString(json);
 				}				
 //			    JSONObject json = new JSONObject();

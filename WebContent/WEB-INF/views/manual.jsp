@@ -689,6 +689,12 @@
 							    <button class="btn btn-sm red-btn" type="button" name="preview_btn" id="preview_btn" onclick="processManualProcedures('PREVIEW_IMAGE_DATA')">
 							     PREVIEW
 							    </button>
+							    <button class="btn btn-sm red-btn" type="button" name="sdiOn_btn" id="sdiOn_btn" onclick="processUserSelection(this)">
+							     SDI ON
+							    </button>
+							    <button class="btn btn-sm red-btn" type="button" name="sdiOff_btn" id="sdiOff_btn" onclick="processUserSelection(this)">
+							     SDI OFF
+							    </button>
 							  </div>
 							</div>
 						 <div class="form-group row row-bottom-margin ml-2">
